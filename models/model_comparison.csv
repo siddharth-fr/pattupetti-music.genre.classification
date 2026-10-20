@@ -1,0 +1,7 @@
+Model,CV F1 (Mean),CV F1 (Std),Test Accuracy,Test Precision,Test Recall,Test Macro F1,Train Time (s)
+Support Vector Machine (SVM),0.528,0.014,0.5356,0.5282,0.5356,0.5287,21.41
+Random Forest,0.4891,0.0126,0.4975,0.4926,0.4975,0.4892,4.07
+Logistic Regression,0.4583,0.0134,0.4838,0.4687,0.4838,0.4694,3.54
+K-Nearest Neighbors (KNN),0.4395,0.0131,0.4581,0.4563,0.4581,0.4486,2.32
+Gaussian Naive Bayes,0.3857,0.0098,0.4119,0.4152,0.4119,0.3832,0.18
+Decision Tree,0.3461,0.0094,0.3362,0.3355,0.3363,0.3346,2.98

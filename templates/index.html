@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pattupetti — Music Genre Classifier</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css?v=8">
+</head>
+<body>
+    <div class="app">
+
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <h1 class="app-title">pattupetti</h1>
+                <span class="app-subtitle">Music Genre Classification</span>
+            </div>
+            <nav class="page-nav">
+                <a href="/" class="nav-link active">Classifier</a>
+                <a href="/docs" class="nav-link">Report</a>
+            </nav>
+        </header>
+
+        <!-- Waveform Player -->
+        <section class="player-card">
+            <div class="player-top">
+                <div class="player-left">
+                    <button class="play-btn" id="capsulePlayBtn">
+                        <span id="playBtnIcon">&#9654;</span>
+                    </button>
+                    <div class="player-meta">
+                        <span class="track-name" id="capsuleTrackTitle">No track loaded</span>
+                        <span class="track-duration" id="capsuleTime">—</span>
+                    </div>
+                </div>
+            </div>
+            <div class="waveform-track" id="waveformTrack">
+                <canvas id="waveformCanvas"></canvas>
+                <div class="scrubber-needle" id="scrubberNeedle">
+                    <div class="needle-handle" id="needleHandle"></div>
+                    <div class="needle-line"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Grid -->
+        <main class="main-grid">
+
+            <!-- LEFT: Input -->
+            <section class="card">
+                <div class="card-label">INPUT</div>
+
+                <div class="tab-row">
+                    <button class="tab active" id="tabLive" data-tab="live">Microphone</button>
+                    <button class="tab" id="tabUpload" data-tab="upload">Upload</button>
+                    <button class="tab" id="tabBench" data-tab="bench">Samples</button>
+                </div>
+
+                <!-- Live Mic -->
+                <div class="tab-view active" id="viewLive">
+                    <div class="mic-area">
+                        <button class="mic-btn" id="micBtn" id="micAuraRing">
+                            <span id="micEmoji">&#9679;</span>
+                        </button>
+                        <div class="mic-text">
+                            <div class="mic-state" id="micHeading">Ready</div>
+                            <div class="mic-hint" id="micTip">Tap to start recording</div>
+                        </div>
+                    </div>
+                    <div class="rec-status" id="liveRecBadge" style="display:none;">
+                        <span class="rec-dot"></span>
+                        <span class="rec-time" id="recTimer">00:00</span>
+                        <span class="rec-label">Recording</span>
+                    </div>
+                </div>
+
+                <!-- Upload -->
+                <div class="tab-view" id="viewUpload">
+                    <div class="drop-area" id="dropZone">
+                        <input type="file" id="audioFileInput" accept=".mp3,.wav,.ogg,.m4a" hidden>
+                        <div class="drop-inner">
+                            <div class="drop-title">Drop audio file</div>
+                            <div class="drop-hint">or <span class="browse-link">browse</span> — MP3, WAV, OGG</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Samples -->
+                <div class="tab-view" id="viewBench">
+                    <div class="samples-list" id="sampleChipsContainer">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Processing overlay -->
+                <div class="analyzing-overlay" id="processingCurtain" style="display:none;">
+                    <div class="analyzing-text">ANALYZING...</div>
+                </div>
+            </section>
+
+            <!-- RIGHT: Results -->
+            <section class="card">
+                <div class="card-label">RESULT</div>
+
+                <!-- Main genre display -->
+                <div class="genre-display">
+                    <div class="genre-label-small">GENRE</div>
+                    <div class="genre-value" id="heroGenreName">—</div>
+                    <div class="confidence-row" id="confidencePill" style="display:none;">
+                        <span class="confidence-label">CONFIDENCE</span>
+                        <span class="confidence-value" id="confidenceText">—</span>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- Metrics row -->
+                <div class="metrics-row">
+                    <div class="metric">
+                        <div class="metric-label">TEMPO</div>
+                        <div class="metric-value" id="valTempo">—</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">BRIGHTNESS</div>
+                        <div class="metric-value" id="valCentroid">—</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">ENERGY</div>
+                        <div class="metric-value" id="valEnergy">—</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">ZCR</div>
+                        <div class="metric-value" id="valZcr">—</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- Genre probability bars -->
+                <div class="prob-section" id="probabilityBarsList">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+
+        </main>
+
+        <audio id="audioElement" preload="auto"></audio>
+    </div>
+
+    <script src="/static/app.js?v=7"></script>
+</body>
+</html>

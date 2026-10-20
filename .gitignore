@@ -1,0 +1,38 @@
+# Virtual Environment
+.venv/
+env/
+venv/
+ENV/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.ipynb_checkpoints/
+
+# Raw Audio Data (Do not sync large 8GB audio dataset)
+data/raw/
+*.part
+
+# Runtime Temp Audio & User Uploads
+data/temp_audio/
+*.wav
+
+# OS Artifacts
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs & IDE
+*.log
+.vscode/
+.idea/
+
+# Models: Keep essential lightweight models for out-of-the-box webapp execution
+# (SVM ~3.4MB, RF ~6.9MB, Scaler & metadata)
+models/*.joblib
+!models/best_model.joblib
+!models/scaler.joblib
+!models/feature_names.joblib
+!models/best_model_name.joblib
+!models/rf_model.joblib

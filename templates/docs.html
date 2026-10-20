@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pattupetti — Project Report</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css?v=8">
+    <link rel="stylesheet" href="/static/docs.css?v=3">
+</head>
+<body>
+    <div class="app">
+
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <h1 class="app-title">pattupetti</h1>
+                <span class="app-subtitle">Project Report</span>
+            </div>
+            <nav class="page-nav">
+                <a href="/" class="nav-link">Classifier</a>
+                <a href="/docs" class="nav-link active">Report</a>
+            </nav>
+        </header>
+
+        <!-- Section 1: Project Overview -->
+        <section class="doc-section">
+            <div class="section-index">01</div>
+            <div class="section-body">
+                <div class="section-title">Overview</div>
+                <p class="section-prose">
+                    A machine learning system that classifies music tracks into one of eight genres by analysing the physics of sound.
+                    Rather than treating audio as a black box, we extract meaningful mathematical descriptors — frequency, timbre, energy, rhythm —
+                    using <strong>Librosa</strong> and train classic classifiers with <strong>Scikit-learn</strong>.
+                </p>
+                <div class="stat-row">
+                    <div class="stat-item">
+                        <div class="stat-value">8,000</div>
+                        <div class="stat-label">Tracks</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">Genres</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">75</div>
+                        <div class="stat-label">Features</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">6</div>
+                        <div class="stat-label">Models</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">53.6%</div>
+                        <div class="stat-label">Best Accuracy</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">4.3×</div>
+                        <div class="stat-label">Above Random</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Dataset -->
+        <section class="doc-section">
+            <div class="section-index">02</div>
+            <div class="section-body">
+                <div class="section-title">Dataset</div>
+                <p class="section-prose">
+                    We use the <strong>FMA Small</strong> subset of the Free Music Archive — a balanced, open-access audio dataset
+                    designed for music analysis research.
+                </p>
+                <div class="table-container">
+                    <table class="doc-table">
+                        <thead>
+                            <tr>
+                                <th>Property</th>
+                                <th>Detail</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Source</td><td>Free Music Archive (FMA Small)</td></tr>
+                            <tr><td>Total tracks</td><td>8,000 tracks</td></tr>
+                            <tr><td>Tracks per genre</td><td>1,000 (perfectly balanced)</td></tr>
+                            <tr><td>Audio format</td><td>MP3, 128 kbps</td></tr>
+                            <tr><td>Clip duration</td><td>30 seconds per track</td></tr>
+                            <tr><td>Sample rate</td><td>22,050 Hz (resampled)</td></tr>
+                            <tr><td>Channels</td><td>Mono</td></tr>
+                            <tr><td>Train / Test split</td><td>80% / 20% (stratified)</td></tr>
+                            <tr><td>Training tracks</td><td>6,400</td></tr>
+                            <tr><td>Test tracks</td><td>1,600</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="genre-grid">
+                    <div class="genre-chip">Electronic</div>
+                    <div class="genre-chip">Experimental</div>
+                    <div class="genre-chip">Folk</div>
+                    <div class="genre-chip">Hip-Hop</div>
+                    <div class="genre-chip">Instrumental</div>
+                    <div class="genre-chip">International</div>
+                    <div class="genre-chip">Pop</div>
+                    <div class="genre-chip">Rock</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Feature Extraction -->
+        <section class="doc-section">
+            <div class="section-index">03</div>
+            <div class="section-body">
+                <div class="section-title">Feature Extraction</div>
+                <p class="section-prose">
+                    Each 30-second clip is loaded as a mono waveform at 22,050 Hz. Eight acoustic descriptor families are computed
+                    using <strong>Librosa</strong>. Time-varying features are summarised by their <strong>mean</strong> and
+                    <strong>standard deviation</strong>, producing a fixed-length vector of <strong>75 numerical features</strong> per track.
+                </p>
+
+                <div class="feature-list">
+                    <div class="feature-row">
+                        <div class="feature-name">
+                            <span class="feature-mono">MFCC</span>
+                            <span class="feature-dim">20 coefficients × 2 stats = 40</span>
+                        </div>
+                        <div class="feature-desc">
+                            Mel-Frequency Cepstral Coefficients. Captures timbral texture and vocal character by mimicking human auditory perception on a mel frequency scale. Distinguishes electric guitar (Rock) from synthesiser bass (Electronic).
+                        </div>
+                    </div>
+                    <div class="feature-row">
+                        <div class="feature-name">
+                            <span class="feature-mono">Chroma STFT</span>
+                            <span class="feature-dim">12 pitch classes × 2 stats = 24</span>
+                        </div>
+                        <div class="feature-desc">
+                            Projects audio energy onto the 12 semitone pitch classes (C, C#, D … B). Captures harmonic content and chord progressions independent of octave.
+                        </div>
+                    </div>
+                    <div class="feature-row">
+                        <div class="feature-name">
+                            <span class="feature-mono">Spectral Centroid</span>
+                            <span class="feature-dim">mean + std = 2</span>
+                        </div>
+                        <div class="feature-desc">
+                            The centre of mass of the frequency spectrum — a measure of brightness. High centroid = bright/sharp (cymbals, brass). Low centroid = warm/deep (bass, cello).
+                        </div>
+                    </div>
+                    <div class="feature-row">
+                        <div class="feature-name">
+                            <span class="feature-mono">Spectral Bandwidth</span>
+                            <span class="feature-dim">mean + std = 2</span>
+                        </div>
+                        <div class="feature-desc">
+                            The spread of frequencies around the centroid. Wide bandwidth indicates a rich, full sound; narrow bandwidth suggests a pure tone.
+                        </div>
+                    </div>
+                    <div class="feature-row">
+                        <div class="feature-name">
+                            <span class="feature-mono">Spectral Rolloff</span>
+                            <span class="feature-dim">mean + std = 2</span>
+                        </div>
+                        <div class="feature-desc">
+                            The frequency below which 85% of total spectral energy lies. Separates high-energy treble-dominant genres from bass-heavy or muffled recordings.
+                        </div>
+                    </div>
+                    <div class="feature-row">
+                        <div class="feature-name">
+                            <span class="feature-mono">Zero-Crossing Rate</span>
+                            <span class="feature-dim">mean + std = 2</span>
+                        </div>
+                        <div class="feature-desc">
+                            How rapidly the waveform crosses the zero-amplitude axis. High ZCR indicates percussive or noisy content; low ZCR indicates sustained harmonic sounds.
+                        </div>
+                    </div>
+                    <div class="feature-row">
+                        <div class="feature-name">
+                            <span class="feature-mono">RMS Energy</span>
+                            <span class="feature-dim">mean + std = 2</span>
+                        </div>
+                        <div class="feature-desc">
+                            Root-mean-square amplitude — a direct measure of perceived loudness and dynamic power range across the clip.
+                        </div>
+                    </div>
+                    <div class="feature-row">
+                        <div class="feature-name">
+                            <span class="feature-mono">Tempo</span>
+                            <span class="feature-dim">1 scalar</span>
+                        </div>
+                        <div class="feature-desc">
+                            Estimated rhythmic speed in beats per minute (BPM), computed via dynamic programming beat tracking. Unmeasured signals fall back to the dataset median of 118 BPM.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-box-label">PREPROCESSING NOTE</div>
+                    Short live microphone recordings (&lt;15 s) are seamlessly tiled to 30 s before feature extraction so the window statistics match the training distribution. All signals are RMS-normalised to a target amplitude of 0.18 before feature computation.
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Training Pipeline -->
+        <section class="doc-section">
+            <div class="section-index">04</div>
+            <div class="section-body">
+                <div class="section-title">Training Pipeline</div>
+                <p class="section-prose">
+                    Features are extracted once and saved to <code class="inline-code">data/processed/features_30s.csv</code>.
+                    Training follows a strict no-leakage pipeline.
+                </p>
+
+                <div class="pipeline-steps">
+                    <div class="pipeline-step">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Load & Split</div>
+                            <div class="step-desc">Features CSV is loaded. Non-feature columns (track_id, genre) are dropped. Stratified 80/20 train-test split is applied — preserving class balance in both sets.</div>
+                        </div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Feature Scaling</div>
+                            <div class="step-desc"><code class="inline-code">StandardScaler</code> is fit exclusively on the training set, then applied to both sets. This prevents data leakage from test statistics into the model.</div>
+                        </div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <div class="step-title">5-Fold Cross-Validation</div>
+                            <div class="step-desc">Stratified K-Fold CV (k=5) is run on the training set for each model. Macro F1 is the primary scoring metric, giving equal weight to every genre regardless of frequency.</div>
+                        </div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="step-num">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Test Evaluation</div>
+                            <div class="step-desc">Each model is retrained on the full training set and evaluated once on the held-out test set. Accuracy, Precision, Recall, and Macro F1 are recorded.</div>
+                        </div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="step-num">5</div>
+                        <div class="step-content">
+                            <div class="step-title">Model Selection & Persistence</div>
+                            <div class="step-desc">The model with highest Test Macro F1 is selected. The model, scaler, and feature list are serialised with <code class="inline-code">joblib</code> for inference.</div>
+                        </div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="step-num">6</div>
+                        <div class="step-content">
+                            <div class="step-title">Inference (Ensemble)</div>
+                            <div class="step-desc">At prediction time, SVM probability outputs and Random Forest probability outputs are averaged. The class with the highest averaged probability is the final prediction.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Model Comparison -->
+        <section class="doc-section">
+            <div class="section-index">05</div>
+            <div class="section-body">
+                <div class="section-title">Model Comparison</div>
+                <p class="section-prose">
+                    Six traditional classifiers were benchmarked on a stratified 80/20 split.
+                    Selection criterion was <strong>Test Macro F1</strong>.
+                    Random chance baseline for 8 balanced genres is <strong>12.5%</strong>.
+                </p>
+
+                <div class="table-container">
+                    <table class="doc-table comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Model</th>
+                                <th>CV F1 Mean</th>
+                                <th>CV F1 Std</th>
+                                <th>Accuracy</th>
+                                <th>Precision</th>
+                                <th>Recall</th>
+                                <th>Macro F1</th>
+                                <th>Train Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="best-row">
+                                <td>1</td>
+                                <td><strong>SVM (RBF)</strong></td>
+                                <td>0.5280</td>
+                                <td>±0.014</td>
+                                <td>53.56%</td>
+                                <td>0.5282</td>
+                                <td>0.5356</td>
+                                <td><strong>0.5287</strong></td>
+                                <td>21.41 s</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Random Forest</td>
+                                <td>0.4891</td>
+                                <td>±0.013</td>
+                                <td>49.75%</td>
+                                <td>0.4926</td>
+                                <td>0.4975</td>
+                                <td>0.4892</td>
+                                <td>4.07 s</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>Logistic Regression</td>
+                                <td>0.4583</td>
+                                <td>±0.013</td>
+                                <td>48.38%</td>
+                                <td>0.4687</td>
+                                <td>0.4838</td>
+                                <td>0.4694</td>
+                                <td>3.54 s</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>K-Nearest Neighbors</td>
+                                <td>0.4395</td>
+                                <td>±0.013</td>
+                                <td>45.81%</td>
+                                <td>0.4563</td>
+                                <td>0.4581</td>
+                                <td>0.4486</td>
+                                <td>2.32 s</td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>Gaussian Naive Bayes</td>
+                                <td>0.3857</td>
+                                <td>±0.010</td>
+                                <td>41.19%</td>
+                                <td>0.4152</td>
+                                <td>0.4119</td>
+                                <td>0.3832</td>
+                                <td>0.18 s</td>
+                            </tr>
+                            <tr>
+                                <td>6</td>
+                                <td>Decision Tree</td>
+                                <td>0.3461</td>
+                                <td>±0.009</td>
+                                <td>33.62%</td>
+                                <td>0.3355</td>
+                                <td>0.3363</td>
+                                <td>0.3346</td>
+                                <td>2.98 s</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Visual bar comparison -->
+                <div class="bar-comparison">
+                    <div class="bar-chart-label">TEST MACRO F1 SCORE</div>
+                    <div class="bar-rows">
+                        <div class="bar-entry">
+                            <div class="bar-entry-name">SVM (RBF)</div>
+                            <div class="bar-track"><div class="bar-fill best" style="width: 52.87%"></div></div>
+                            <div class="bar-entry-val">0.5287</div>
+                        </div>
+                        <div class="bar-entry">
+                            <div class="bar-entry-name">Random Forest</div>
+                            <div class="bar-track"><div class="bar-fill" style="width: 48.92%"></div></div>
+                            <div class="bar-entry-val">0.4892</div>
+                        </div>
+                        <div class="bar-entry">
+                            <div class="bar-entry-name">Logistic Regression</div>
+                            <div class="bar-track"><div class="bar-fill" style="width: 46.94%"></div></div>
+                            <div class="bar-entry-val">0.4694</div>
+                        </div>
+                        <div class="bar-entry">
+                            <div class="bar-entry-name">K-Nearest Neighbors</div>
+                            <div class="bar-track"><div class="bar-fill" style="width: 44.86%"></div></div>
+                            <div class="bar-entry-val">0.4486</div>
+                        </div>
+                        <div class="bar-entry">
+                            <div class="bar-entry-name">Gaussian Naive Bayes</div>
+                            <div class="bar-track"><div class="bar-fill" style="width: 38.32%"></div></div>
+                            <div class="bar-entry-val">0.3832</div>
+                        </div>
+                        <div class="bar-entry">
+                            <div class="bar-entry-name">Decision Tree</div>
+                            <div class="bar-track"><div class="bar-fill" style="width: 33.46%"></div></div>
+                            <div class="bar-entry-val">0.3346</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Best Model -->
+        <section class="doc-section">
+            <div class="section-index">06</div>
+            <div class="section-body">
+                <div class="section-title">Best Model — SVM with RBF Kernel</div>
+                <p class="section-prose">
+                    Support Vector Machine with a Radial Basis Function kernel achieved the highest performance across all metrics.
+                    At inference time it is combined with Random Forest in a <strong>soft-voting ensemble</strong>, averaging predicted
+                    class probabilities to improve robustness on unseen audio.
+                </p>
+
+                <div class="stat-row">
+                    <div class="stat-item">
+                        <div class="stat-value">53.56%</div>
+                        <div class="stat-label">Test Accuracy</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">0.5287</div>
+                        <div class="stat-label">Macro F1</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">0.5282</div>
+                        <div class="stat-label">Macro Precision</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">0.5280</div>
+                        <div class="stat-label">CV F1 (5-Fold)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">±0.014</div>
+                        <div class="stat-label">CV Std Dev</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">21.41 s</div>
+                        <div class="stat-label">Train Time</div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="doc-table">
+                        <thead>
+                            <tr>
+                                <th>Hyperparameter</th>
+                                <th>Value</th>
+                                <th>Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Kernel</td><td><code class="inline-code">rbf</code></td><td>Handles non-linear boundaries between genres</td></tr>
+                            <tr><td>C (regularisation)</td><td><code class="inline-code">1.0</code> (default)</td><td>Balanced margin / misclassification penalty</td></tr>
+                            <tr><td>Gamma</td><td><code class="inline-code">scale</code> (default)</td><td>Adapts to number of features automatically</td></tr>
+                            <tr><td>Probability</td><td><code class="inline-code">True</code></td><td>Required for soft-voting ensemble output</td></tr>
+                            <tr><td>Random state</td><td><code class="inline-code">42</code></td><td>Reproducibility</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-box-label">WHY SVM WINS</div>
+                    SVM excels in high-dimensional feature spaces (75 features, 6,400 samples). The RBF kernel finds non-linear decision
+                    boundaries that separate genres whose acoustic features partially overlap (e.g. Experimental vs. Electronic).
+                    Because features are StandardScaler-normalised first, SVM's distance-based margin is not distorted by scale differences between MFCC coefficients and Tempo.
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 7: Tech Stack -->
+        <section class="doc-section">
+            <div class="section-index">07</div>
+            <div class="section-body">
+                <div class="section-title">Technology Stack</div>
+                <div class="table-container">
+                    <table class="doc-table">
+                        <thead>
+                            <tr><th>Library</th><th>Version</th><th>Role</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Python</td><td>3.10+</td><td>Core language</td></tr>
+                            <tr><td>Librosa</td><td>0.10.x</td><td>Audio loading, feature extraction</td></tr>
+                            <tr><td>Scikit-learn</td><td>1.4.x</td><td>Classifiers, scaling, CV, metrics</td></tr>
+                            <tr><td>NumPy</td><td>1.26.x</td><td>Numerical arrays and operations</td></tr>
+                            <tr><td>Pandas</td><td>2.x</td><td>Tabular data management</td></tr>
+                            <tr><td>Joblib</td><td>1.3.x</td><td>Model serialisation + parallel extraction</td></tr>
+                            <tr><td>SciPy</td><td>1.12.x</td><td>WAV fallback loader</td></tr>
+                            <tr><td>Flask</td><td>3.x</td><td>Web server and REST API</td></tr>
+                            <tr><td>PyAV</td><td>12.x</td><td>WebM / Opus audio decoding (mic recordings)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="doc-footer">
+            <span>pattupetti — Music Genre Classification</span>
+            <span>2nd Year B.Tech AI & DS Mini-Project</span>
+        </footer>
+
+    </div>
+</body>
+</html>
