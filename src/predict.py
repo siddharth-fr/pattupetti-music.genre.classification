@@ -21,13 +21,39 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from src.features import extract_features_from_audio
 
+# In-memory artifact cache to avoid expensive disk reloads on every prediction request
+_MODEL_CACHE = {}
+
+
+def get_loaded_models(models_dir: str = "models"):
+    """Loads and caches model artifacts in memory."""
+    global _MODEL_CACHE
+    if models_dir not in _MODEL_CACHE:
+        models_path = Path(models_dir)
+        if not models_path.exists():
+            raise FileNotFoundError(f"Models directory not found: {models_dir}")
+        model = joblib.load(models_path / "best_model.joblib")
+        scaler = joblib.load(models_path / "scaler.joblib")
+        feature_names = joblib.load(models_path / "feature_names.joblib")
+        best_name = joblib.load(models_path / "best_model_name.joblib")
+        rf_model_path = models_path / "rf_model.joblib"
+        rf_model = joblib.load(rf_model_path) if rf_model_path.exists() else None
+        _MODEL_CACHE[models_dir] = {
+            "model": model,
+            "scaler": scaler,
+            "feature_names": feature_names,
+            "best_name": best_name,
+            "rf_model": rf_model,
+        }
+    return _MODEL_CACHE[models_dir]
+
 
 def predict_genre(audio_path: str, models_dir: str = "models") -> dict:
     """
     Predicts the genre of an input audio file.
     
     Args:
-        audio_path: Path to .mp3 or .wav file.
+        audio_path: Path to .mp3, .wav, .m4a, or .webm file.
         models_dir: Directory containing saved model artifacts.
         
     Returns:
@@ -37,21 +63,22 @@ def predict_genre(audio_path: str, models_dir: str = "models") -> dict:
     if not audio_file.exists():
         raise FileNotFoundError(f"Audio file not found: {audio_path}")
 
-    # Load artifacts
-    models_path = Path(models_dir)
-    model = joblib.load(models_path / "best_model.joblib")
-    scaler = joblib.load(models_path / "scaler.joblib")
-    feature_names = joblib.load(models_path / "feature_names.joblib")
-    best_name = joblib.load(models_path / "best_model_name.joblib")
+    # Load artifacts from cache
+    artifacts = get_loaded_models(models_dir)
+    model = artifacts["model"]
+    scaler = artifacts["scaler"]
+    feature_names = artifacts["feature_names"]
+    best_name = artifacts["best_name"]
+    rf_model = artifacts["rf_model"]
 
     print(f"\nAnalyzing track: {audio_file.name}")
     print(f"Loaded classifier: {best_name}")
     print("Extracting acoustic features (MFCC, Chroma, Spectral, RMS, Tempo)...")
 
-    # Extract features
-    raw_features = extract_features_from_audio(str(audio_file))
+    # Extract features (raising informative errors directly)
+    raw_features = extract_features_from_audio(str(audio_file), raise_on_error=True)
     if raw_features is None:
-        raise ValueError(f"Could not extract features from '{audio_path}'. File may be corrupt or silent.")
+        raise ValueError(f"Could not extract features from '{audio_path}'. File may be corrupt, unsupported, or silent.")
 
     # Align features exactly to training feature order
     feature_vector = [raw_features[col] for col in feature_names]
@@ -65,10 +92,6 @@ def predict_genre(audio_path: str, models_dir: str = "models") -> dict:
     # feature has extreme z-score outliers (e.g. ambient mic noise or high MFCC variance).
     # Clamping to [-3.2, 3.2] preserves statistical ranking while keeping Euclidean distance bounded.
     X_scaled_regularized = np.clip(X_scaled, -3.2, 3.2)
-
-    # Check for secondary tree-based model (Random Forest) for out-of-distribution robustness
-    rf_model_path = models_path / "rf_model.joblib"
-    rf_model = joblib.load(rf_model_path) if rf_model_path.exists() else None
 
     # Compute probabilities with primary and secondary models
     if hasattr(model, "predict_proba"):

@@ -76,6 +76,10 @@ def stream_sample_audio(track_id):
     return send_file(audio_path, mimetype="audio/mpeg")
 
 
+# In-memory prediction cache for bundled demo tracks (instant response on Render free-tier)
+_SAMPLE_PREDICTIONS_CACHE = {}
+
+
 @app.route("/api/predict", methods=["POST"])
 def predict():
     """
@@ -86,13 +90,23 @@ def predict():
         return jsonify({"status": "error", "message": "No audio file provided."}), 400
 
     audio_file = request.files["audio"]
-    if audio_file.filename == "":
-        return jsonify({"status": "error", "message": "Empty audio file received."}), 400
+    if not audio_file or audio_file.filename == "":
+        return jsonify({"status": "error", "message": "Empty or missing audio file received."}), 400
 
-    # Generate unique temp filename preserving extension
+    # Generate unique temp filename preserving proper extension
     ext = os.path.splitext(audio_file.filename)[1].lower()
     if not ext:
-        ext = ".wav"  # Default for browser recorded audio blobs
+        content_type = (audio_file.content_type or "").lower()
+        if "webm" in content_type:
+            ext = ".webm"
+        elif "mp4" in content_type or "m4a" in content_type:
+            ext = ".m4a"
+        elif "ogg" in content_type:
+            ext = ".ogg"
+        elif "mp3" in content_type or "mpeg" in content_type:
+            ext = ".mp3"
+        else:
+            ext = ".wav"
 
     temp_filename = f"temp_{int(time.time())}_{uuid.uuid4().hex[:8]}{ext}"
     temp_path = TEMP_DIR / temp_filename
@@ -101,6 +115,12 @@ def predict():
         audio_file.save(str(temp_path))
         file_size = temp_path.stat().st_size
         print(f"\n[API /predict] Received audio: '{audio_file.filename}' ({file_size} bytes)", flush=True)
+
+        if file_size == 0:
+            return jsonify({
+                "status": "error",
+                "message": "The received audio recording is empty (0 bytes). Please ensure microphone access is granted and sound was captured."
+            }), 400
 
         # Run model inference
         result = predict_genre(str(temp_path))
@@ -118,8 +138,9 @@ def predict():
     except Exception as e:
         import traceback
         traceback.print_exc()
-        print(f"[API /predict ERROR] {type(e).__name__}: {e}", flush=True)
-        return jsonify({"status": "error", "message": f"{type(e).__name__}: {str(e)}"}), 500
+        err_msg = str(e)
+        print(f"[API /predict ERROR] {type(e).__name__}: {err_msg}", flush=True)
+        return jsonify({"status": "error", "message": err_msg}), 500
 
     finally:
         # Clean up temporary file
@@ -132,7 +153,10 @@ def predict():
 
 @app.route("/api/predict-sample/<int:track_id>", methods=["GET"])
 def predict_sample(track_id):
-    """Predicts directly from a known sample track ID."""
+    """Predicts directly from a known sample track ID with memoized caching."""
+    if track_id in _SAMPLE_PREDICTIONS_CACHE:
+        return jsonify(_SAMPLE_PREDICTIONS_CACHE[track_id])
+
     bundled_path = SAMPLES_DIR / f"{track_id:06d}.mp3"
     if bundled_path.exists():
         audio_path = bundled_path
@@ -147,14 +171,18 @@ def predict_sample(track_id):
 
     try:
         result = predict_genre(str(audio_path))
-        return jsonify({
+        response_payload = {
             "status": "success",
             "predicted_genre": result["predicted_genre"],
             "model_used": result["model_used"],
             "probabilities": result["probabilities"],
             "metrics": result.get("metrics", {})
-        })
+        }
+        _SAMPLE_PREDICTIONS_CACHE[track_id] = response_payload
+        return jsonify(response_payload)
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({"status": "error", "message": str(e)}), 500
 
 

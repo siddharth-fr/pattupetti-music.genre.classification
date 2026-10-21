@@ -409,9 +409,12 @@ micBtn.addEventListener('click', async () => {
                 pcmChunks.push(new Float32Array(channelData));
             };
 
-            // Connect script processor to stream and a dummy silent destination to keep it alive
+            // Connect script processor through a silent gain node to prevent speaker feedback and OS mic muting
+            const silentGain = micAudioCtx.createGain();
+            silentGain.gain.value = 0;
             micSourceNode.connect(micScriptNode);
-            micScriptNode.connect(micAudioCtx.destination);
+            micScriptNode.connect(silentGain);
+            silentGain.connect(micAudioCtx.destination);
 
             // Update UI State
             isRecording = true;
@@ -691,18 +694,29 @@ function selectSampleTrack(index) {
     fetchSamplePrediction(track.id);
 }
 
+async function safeParseJsonResponse(res) {
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+        if (res.status === 502 || res.status === 504 || res.status === 408) {
+            throw new Error(`Server timeout (${res.status}). The server took too long to respond. Please try again or use a shorter track.`);
+        }
+        throw new Error(`Server returned HTTP ${res.status} (${res.statusText || 'Non-JSON response'}).`);
+    }
+    return await res.json();
+}
+
 async function fetchSamplePrediction(trackId) {
     showCurtain(true);
     try {
         const res = await fetch(`/api/predict-sample/${trackId}`);
-        const data = await res.json();
+        const data = await safeParseJsonResponse(res);
         if (data.status === 'success') {
             renderResults(data);
         } else {
-            alert('Prediction error: ' + data.message);
+            showPredictionError(data.message || 'Sample prediction failed');
         }
     } catch (err) {
-        alert('Server connection error: ' + err.message);
+        showPredictionError(err.message || 'Server connection error');
     } finally {
         showCurtain(false);
     }
@@ -722,14 +736,14 @@ async function triggerPredictionAPI(formData) {
             method: 'POST',
             body: formData
         });
-        const data = await res.json();
+        const data = await safeParseJsonResponse(res);
         if (data.status === 'success') {
             renderResults(data);
         } else {
             showPredictionError(data.message || 'Could not classify audio');
         }
     } catch (err) {
-        showPredictionError('Server connection failed: ' + err.message);
+        showPredictionError(err.message || 'Server connection failed');
     } finally {
         showCurtain(false);
     }
