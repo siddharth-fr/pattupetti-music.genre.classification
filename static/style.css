@@ -1,9 +1,9 @@
 /* ─────────────────────────────────────────────────────────
-   pattupetti — Minimal Aesthetic Design System
-   Palette: Sage linen background, white cards, dark text
+   pattupetti — Minimal Industrial Audio Recorder Aesthetic
+   Palette: Concrete grey, matte charcoal hardware, signal vermilion red
    ───────────────────────────────────────────────────────── */
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,300&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,300&family=DM+Mono:wght@400;500;600&display=swap');
 
 /* ── Reset ── */
 *, *::before, *::after {
@@ -14,21 +14,25 @@
 
 /* ── Design Tokens ── */
 :root {
-    --bg:           #dde5da;
-    --bg-alt:       #d2dccf;
-    --surface:      #f5f7f4;
-    --border:       #c3cfc0;
-    --border-light: #dae3d6;
-    --text-primary: #1a1f18;
-    --text-secondary: #5a6656;
-    --text-muted:   #8a9e84;
-    --accent:       #2e4a26;
-    --accent-soft:  #4a7040;
-    --mono:         'DM Mono', monospace;
-    --sans:         'DM Sans', sans-serif;
-    --radius-sm:    8px;
-    --radius-md:    14px;
-    --radius-lg:    20px;
+    --bg:             #e2e2e0;
+    --bg-alt:         #d4d5d8;
+    --surface:        #ededeb;
+    --surface-sunken: #dadbdc;
+    --border:         #c4c7cc;
+    --border-light:   #d8dadf;
+    --text-primary:   #161719;
+    --text-secondary: #585b62;
+    --text-muted:     #8a8e96;
+    --accent:         #e52421;        /* Iconic Signal Vermilion Red */
+    --accent-hover:   #cf1e1b;
+    --accent-soft:    #e52421;
+    --dark-chip:      #18191b;        /* Matte Black Hardware Badge */
+    --dark-chip-text: #f0f2f5;
+    --mono:           'DM Mono', monospace;
+    --sans:           'DM Sans', sans-serif;
+    --radius-sm:      6px;
+    --radius-md:      12px;
+    --radius-lg:      18px;
 }
 
 /* ── Base ── */
@@ -113,9 +117,9 @@ html, body {
 }
 
 .nav-link.active {
-    background: var(--accent);
+    background: var(--dark-chip);
     color: #ffffff;
-    box-shadow: 0 1px 3px rgba(46, 74, 38, 0.25);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -155,12 +159,13 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.15s, border-color 0.15s;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
     flex-shrink: 0;
 }
 .play-btn:hover {
-    background: var(--bg-alt);
-    border-color: var(--accent-soft);
+    background: var(--dark-chip);
+    border-color: var(--dark-chip);
+    color: #ffffff;
 }
 
 .player-meta {
@@ -192,8 +197,8 @@ html, body {
     cursor: pointer;
     border-radius: var(--radius-sm);
     overflow: hidden;
-    background: var(--bg);
-    border: 1px solid var(--border-light);
+    background: var(--surface-sunken);
+    border: 1px solid var(--border);
 }
 
 #waveformCanvas {
@@ -216,11 +221,12 @@ html, body {
 }
 
 .needle-handle {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: var(--accent);
-    margin-top: 4px;
+    box-shadow: 0 0 0 1.5px #ffffff;
+    margin-top: 3px;
     pointer-events: all;
     cursor: grab;
     flex-shrink: 0;
@@ -228,10 +234,10 @@ html, body {
 .needle-handle:active { cursor: grabbing; }
 
 .needle-line {
-    width: 1.5px;
+    width: 2px;
     flex: 1;
     background: var(--accent);
-    opacity: 0.7;
+    opacity: 0.95;
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -337,18 +343,18 @@ html, body {
 }
 .mic-btn:hover {
     background: var(--bg-alt);
-    border-color: var(--accent-soft);
+    border-color: var(--accent);
 }
 .mic-btn.recording {
-    background: #f0f0f0;
-    border-color: #c0392b;
-    color: #c0392b;
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
     animation: pulse-ring 1.4s ease-in-out infinite;
 }
 
 @keyframes pulse-ring {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(192, 57, 43, 0.2); }
-    50%       { box-shadow: 0 0 0 8px rgba(192, 57, 43, 0); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(229, 36, 33, 0.4); }
+    50%       { box-shadow: 0 0 0 8px rgba(229, 36, 33, 0); }
 }
 
 #micEmoji {
@@ -379,8 +385,8 @@ html, body {
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
-    background: var(--bg);
-    border: 1px solid var(--border-light);
+    background: var(--dark-chip);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: var(--radius-sm);
 }
 
@@ -388,7 +394,8 @@ html, body {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #c0392b;
+    background: var(--accent);
+    box-shadow: 0 0 6px var(--accent);
     animation: blink 1s step-end infinite;
 }
 
@@ -400,12 +407,16 @@ html, body {
 .rec-time {
     font-family: var(--mono);
     font-size: 0.82rem;
-    color: var(--text-primary);
+    color: #ffffff;
+    letter-spacing: 0.04em;
 }
 
 .rec-label {
-    font-size: 0.75rem;
-    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -419,10 +430,11 @@ html, body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    background: var(--surface);
     transition: border-color 0.15s, background 0.15s;
 }
 .drop-area:hover, .drop-area.dragover {
-    border-color: var(--accent-soft);
+    border-color: var(--accent);
     background: var(--bg-alt);
 }
 
@@ -445,7 +457,8 @@ html, body {
 }
 
 .browse-link {
-    color: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 500;
     text-decoration: underline;
     cursor: pointer;
 }
@@ -507,19 +520,21 @@ html, body {
 .analyzing-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(245, 247, 244, 0.9);
+    background: rgba(237, 237, 235, 0.94);
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: var(--radius-lg);
     z-index: 20;
+    backdrop-filter: blur(2px);
 }
 
 .analyzing-text {
-    font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: 0.18em;
-    color: var(--text-muted);
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: var(--accent);
     animation: fade-pulse 1.2s ease-in-out infinite;
 }
 
@@ -556,25 +571,31 @@ html, body {
 }
 
 .confidence-row {
-    display: flex;
-    align-items: baseline;
+    display: inline-flex;
+    align-items: center;
     gap: 8px;
-    margin-top: 2px;
+    margin-top: 6px;
+    background: var(--dark-chip);
+    border-radius: 999px;
+    padding: 4px 12px;
+    width: fit-content;
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .confidence-label {
-    font-size: 0.68rem;
-    font-weight: 500;
-    letter-spacing: 0.12em;
+    font-size: 0.64rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
     color: var(--text-muted);
     text-transform: uppercase;
 }
 
 .confidence-value {
-    font-size: 0.85rem;
-    font-weight: 500;
+    font-size: 0.82rem;
+    font-weight: 600;
     font-family: var(--mono);
-    color: var(--accent-soft);
+    color: #ffffff;
+    letter-spacing: 0.04em;
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -657,19 +678,19 @@ html, body {
 }
 
 .prob-track {
-    height: 4px;
-    background: var(--bg-alt);
-    border-radius: 2px;
+    height: 6px;
+    background: var(--surface-sunken);
+    border-radius: 3px;
     overflow: hidden;
 }
 
 .prob-fill {
     height: 100%;
-    background: var(--border);
-    border-radius: 2px;
+    background: #9ca1a9;
+    border-radius: 3px;
     transition: width 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .prob-fill.top-rank {
-    background: var(--accent-soft);
+    background: var(--accent);
 }

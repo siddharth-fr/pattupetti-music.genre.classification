@@ -189,13 +189,13 @@ function drawWaveform() {
 
         const barHalfHeight = Math.max(3, barHeightRatio * maxBarHalfHeight);
 
-        // Color coding matching the user's reference image:
-        // Left of needle scrubber = Solid Charcoal (#1c2024)
-        // Right of needle scrubber = Soft Silvery-Lavender (#d2d7e3)
+        // Color coding matching the industrial audio recorder:
+        // Left of needle scrubber = Deep Charcoal (#161719)
+        // Right of needle scrubber = Soft Mechanical Grey (#b8bcc4)
         if (barX <= scrubberX) {
-            canvasCtx.fillStyle = '#1c2024';
+            canvasCtx.fillStyle = '#161719';
         } else {
-            canvasCtx.fillStyle = '#d2d7e3';
+            canvasCtx.fillStyle = '#b8bcc4';
         }
 
         // Draw vertical pill bar with rounded caps
