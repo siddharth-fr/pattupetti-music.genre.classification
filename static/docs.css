@@ -98,6 +98,66 @@
     letter-spacing: 0.06em;
 }
 
+/* ── Data Preview Tables ── */
+.preview-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    margin-top: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.preview-label::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 14px;
+    background: var(--accent);
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.preview-note {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+    padding-left: 2px;
+}
+
+.preview-table th {
+    font-size: 0.68rem;
+    padding: 8px 12px;
+    white-space: nowrap;
+}
+
+.preview-table td {
+    padding: 7px 12px;
+    font-size: 0.82rem;
+}
+
+.preview-table td.mono {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+}
+
+.genre-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    background: var(--dark-chip);
+    color: #ffffff;
+    white-space: nowrap;
+}
+
 /* ── Tables ── */
 .table-container {
     width: 100%;

@@ -7,8 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/style.css?v=10">
-    <link rel="stylesheet" href="/static/docs.css?v=4">
+    <link rel="stylesheet" href="/static/style.css?v=11">
+    <link rel="stylesheet" href="/static/docs.css?v=5">
 </head>
 <body>
     <div class="app">
@@ -106,6 +106,32 @@
                     <div class="genre-chip">Pop</div>
                     <div class="genre-chip">Rock</div>
                 </div>
+
+                <!-- Dataset sample rows -->
+                <div class="preview-label">DATASET SAMPLE — First 5 Tracks (fma_metadata)</div>
+                <div class="table-container">
+                    <table class="doc-table preview-table">
+                        <thead>
+                            <tr>
+                                <th>track_id</th>
+                                <th>genre</th>
+                                <th>title</th>
+                                <th>artist</th>
+                                <th>duration (s)</th>
+                                <th>bit_rate</th>
+                                <th>split</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="mono">2</td><td><span class="genre-badge">Hip-Hop</span></td><td>Awaken</td><td>AWOL</td><td class="mono">30</td><td class="mono">128000</td><td class="mono">training</td></tr>
+                            <tr><td class="mono">5</td><td><span class="genre-badge">Hip-Hop</span></td><td>Food</td><td>AWOL</td><td class="mono">30</td><td class="mono">128000</td><td class="mono">training</td></tr>
+                            <tr><td class="mono">10</td><td><span class="genre-badge">Pop</span></td><td>Electric Ave</td><td>Kurt Vile</td><td class="mono">30</td><td class="mono">128000</td><td class="mono">training</td></tr>
+                            <tr><td class="mono">140</td><td><span class="genre-badge">Folk</span></td><td>Traction</td><td>Bright Mountain Choir</td><td class="mono">30</td><td class="mono">128000</td><td class="mono">training</td></tr>
+                            <tr><td class="mono">141</td><td><span class="genre-badge">Folk</span></td><td>Instrumental</td><td>Bright Mountain Choir</td><td class="mono">30</td><td class="mono">128000</td><td class="mono">training</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="preview-note">8,000 tracks total · 1,000 per genre · 30-second clips at 128 kbps MP3</div>
             </div>
         </section>
 
@@ -195,6 +221,55 @@
                     </div>
                 </div>
 
+                <!-- Extracted features CSV preview -->
+                <div class="preview-label">EXTRACTED FEATURES — features_30s.csv (First 5 Rows, Key Columns)</div>
+                <div class="table-container">
+                    <table class="doc-table preview-table">
+                        <thead>
+                            <tr>
+                                <th>track_id</th>
+                                <th>genre</th>
+                                <th>tempo</th>
+                                <th>rms_mean</th>
+                                <th>spectral_centroid_mean</th>
+                                <th>spectral_rolloff_mean</th>
+                                <th>zcr_mean</th>
+                                <th>mfcc_1_mean</th>
+                                <th>mfcc_2_mean</th>
+                                <th>chroma_1_mean</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="mono">2</td><td><span class="genre-badge">Hip-Hop</span></td><td class="mono">161.50</td><td class="mono">0.1452</td><td class="mono">3056.6</td><td class="mono">6253.8</td><td class="mono">0.1644</td><td class="mono">−66.78</td><td class="mono">64.26</td><td class="mono">0.7470</td></tr>
+                            <tr><td class="mono">5</td><td><span class="genre-badge">Hip-Hop</span></td><td class="mono">99.38</td><td class="mono">0.1488</td><td class="mono">2430.6</td><td class="mono">5471.2</td><td class="mono">0.1006</td><td class="mono">−105.96</td><td class="mono">86.37</td><td class="mono">0.4089</td></tr>
+                            <tr><td class="mono">10</td><td><span class="genre-badge">Pop</span></td><td class="mono">112.35</td><td class="mono">0.1882</td><td class="mono">2358.1</td><td class="mono">4332.4</td><td class="mono">0.1489</td><td class="mono">−16.81</td><td class="mono">93.61</td><td class="mono">0.2837</td></tr>
+                            <tr><td class="mono">140</td><td><span class="genre-badge">Folk</span></td><td class="mono">107.67</td><td class="mono">0.0692</td><td class="mono">1765.9</td><td class="mono">3918.6</td><td class="mono">0.0445</td><td class="mono">−278.15</td><td class="mono">100.81</td><td class="mono">0.2428</td></tr>
+                            <tr><td class="mono">141</td><td><span class="genre-badge">Folk</span></td><td class="mono">103.36</td><td class="mono">0.1013</td><td class="mono">1666.7</td><td class="mono">3338.6</td><td class="mono">0.0620</td><td class="mono">−208.31</td><td class="mono">116.05</td><td class="mono">0.1641</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="preview-note">77 columns total: track_id · genre · 75 acoustic feature columns (mean &amp; std per descriptor) · 7,994 rows in full CSV</div>
+
+                <!-- Full feature column schema -->
+                <div class="preview-label" style="margin-top:18px">FULL FEATURE SCHEMA — All 75 Columns</div>
+                <div class="table-container">
+                    <table class="doc-table preview-table">
+                        <thead>
+                            <tr><th>Feature Group</th><th>Column Names</th><th>Count</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>RMS Energy</td><td class="mono">rms_mean, rms_std</td><td class="mono">2</td></tr>
+                            <tr><td>Spectral Centroid</td><td class="mono">spectral_centroid_mean, spectral_centroid_std</td><td class="mono">2</td></tr>
+                            <tr><td>Spectral Bandwidth</td><td class="mono">spectral_bandwidth_mean, spectral_bandwidth_std</td><td class="mono">2</td></tr>
+                            <tr><td>Spectral Rolloff</td><td class="mono">spectral_rolloff_mean, spectral_rolloff_std</td><td class="mono">2</td></tr>
+                            <tr><td>Zero-Crossing Rate</td><td class="mono">zcr_mean, zcr_std</td><td class="mono">2</td></tr>
+                            <tr><td>Chroma STFT (12 classes)</td><td class="mono">chroma_1_mean … chroma_12_mean, chroma_1_std … chroma_12_std</td><td class="mono">24</td></tr>
+                            <tr><td>MFCCs (20 coefficients)</td><td class="mono">mfcc_1_mean … mfcc_20_mean, mfcc_1_std … mfcc_20_std</td><td class="mono">40</td></tr>
+                            <tr><td>Tempo</td><td class="mono">tempo</td><td class="mono">1</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
                 <div class="info-box">
                     <div class="info-box-label">PREPROCESSING NOTE</div>
                     Short live microphone recordings (&lt;15 s) are seamlessly tiled to 30 s before feature extraction so the window statistics match the training distribution. All signals are RMS-normalised to a target amplitude of 0.18 before feature computation.
@@ -208,9 +283,29 @@
             <div class="section-body">
                 <div class="section-title">Training Pipeline</div>
                 <p class="section-prose">
-                    Features are extracted once and saved to <code class="inline-code">data/processed/features_30s.csv</code>.
+                    Features are extracted once and saved to <code class="inline-code">data/processed/features_30s.csv</code> (11.4 MB · 7,994 rows × 77 columns).
                     Training follows a strict no-leakage pipeline.
                 </p>
+
+                <!-- CSV file structure preview -->
+                <div class="preview-label">CSV FILE STRUCTURE — features_30s.csv</div>
+                <div class="table-container">
+                    <table class="doc-table preview-table">
+                        <thead>
+                            <tr><th>Column</th><th>Type</th><th>Example Value</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="mono">track_id</td><td class="mono">int</td><td class="mono">2</td><td>FMA unique track identifier</td></tr>
+                            <tr><td class="mono">genre</td><td class="mono">str</td><td class="mono">Hip-Hop</td><td>Ground truth label (8 classes)</td></tr>
+                            <tr><td class="mono">tempo</td><td class="mono">float</td><td class="mono">161.499</td><td>Estimated BPM via beat tracking</td></tr>
+                            <tr><td class="mono">rms_mean</td><td class="mono">float</td><td class="mono">0.1452</td><td>Mean RMS energy (loudness)</td></tr>
+                            <tr><td class="mono">mfcc_1_mean … mfcc_20_std</td><td class="mono">float</td><td class="mono">−66.78 … 12.4</td><td>40 MFCC stat columns</td></tr>
+                            <tr><td class="mono">chroma_1_mean … chroma_12_std</td><td class="mono">float</td><td class="mono">0.747 … 0.11</td><td>24 chroma stat columns</td></tr>
+                            <tr><td class="mono">spectral_*</td><td class="mono">float</td><td class="mono">3056.6 …</td><td>6 spectral descriptor stat columns</td></tr>
+                            <tr><td class="mono">zcr_mean, zcr_std</td><td class="mono">float</td><td class="mono">0.1644</td><td>Zero-crossing rate stats</td></tr>
+                        </tbody>
+                    </table>
+                </div>
 
                 <div class="pipeline-steps">
                     <div class="pipeline-step">
